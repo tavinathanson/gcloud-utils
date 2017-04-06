@@ -1,8 +1,12 @@
-for POOLNUM in {2..16}
+for POOLNUM in $(eval echo {$1..$2})
 do
+    echo "Increase size for $POOLNUM..."
 	  export MAIN_NFS_SERVER=tavi-cloud-nfs-$POOLNUM
 	  export ADD_NFS_SIZE=2000 # in GBs
-	  export NEW_DISK_NAME=tavi-cloud-nfs-$POOLNUM-disk-2
+    export OLD_DISK_NUM=$(eval gcloud compute disks list | grep tavi-cloud-nfs-$POOLNUM | awk 'BEGIN {FS="disk-"} {print $2}' | sed '/^\s*$/d' | cut -d \  -f 1)
+    export DISK_NUM=$((OLD_DISK_NUM + 1))
+    echo "Using disk number $DISK_NUM..."
+	  export NEW_DISK_NAME=tavi-cloud-nfs-$POOLNUM-disk-$DISK_NUM
 	  export GCLOUD_ZONE=us-east1-b
 	  export ZPOOL_NAME=nfs-pool
 
